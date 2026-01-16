@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:untitled/app.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
@@ -63,8 +62,11 @@ class _AuthScreenState extends State<AuthScreen>
 
   void _handleSignUp() {
     if (_signUpFormKey.currentState!.validate()) {
-      // Navigate to home on successful sign up
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      Navigator.pushNamed(
+        context,
+        AppRoutes.verifyEmail,
+        arguments: _signUpEmailController.text,
+      );
     }
   }
 
@@ -309,8 +311,7 @@ class _AuthScreenState extends State<AuthScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 40.h),
-            
+
             // Create Account Header
             Text(
               'Create an account',

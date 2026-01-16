@@ -5,6 +5,7 @@ import '../presentation/ui/screens/onboarding_screen.dart';
 import '../presentation/ui/screens/welcome_screen.dart';
 import '../presentation/ui/screens/auth_screen.dart';
 import '../presentation/ui/screens/verify_email_screen.dart';
+import '../presentation/ui/screens/registration_steps_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -22,6 +23,8 @@ class RouteGenerator {
         final args = settings.arguments;
         final email = args is String ? args : (args is Map ? args['email'] as String? : null);
         return MaterialPageRoute(builder: (_) => VerifyEmailScreen(email: email ?? 'your@email.com'));
+      case AppRoutes.registration:
+        return MaterialPageRoute(builder: (_) => const RegistrationStepsScreen());
       case AppRoutes.home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       
