@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import '../core/utils/helpers.dart';
 import '../presentation/ui/screens/home_screen.dart';
 import '../presentation/ui/screens/splash_screen.dart';
 import '../presentation/ui/screens/onboarding_screen.dart';
 import '../presentation/ui/screens/welcome_screen.dart';
 import '../presentation/ui/screens/auth_screen.dart';
 import '../presentation/ui/screens/verify_email_screen.dart';
-import '../presentation/ui/screens/registration_steps_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -18,15 +18,33 @@ class RouteGenerator {
       case AppRoutes.welcome:
         return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case AppRoutes.auth:
-        return MaterialPageRoute(builder: (_) => const AuthScreen());
-      case AppRoutes.verifyEmail:
-        final args = settings.arguments;
-        final email = args is String ? args : (args is Map ? args['email'] as String? : null);
-        return MaterialPageRoute(builder: (_) => VerifyEmailScreen(email: email ?? 'your@email.com'));
-      case AppRoutes.registration:
-        return MaterialPageRoute(builder: (_) => const RegistrationStepsScreen());
+        return MaterialPageRoute(
+          builder: (_) {
+            final initialIndex = (settings.arguments as int?) ?? 0;
+            return AuthScreen(
+              signInUseCase: AppDependencies.signInUseCase,
+              signUpUseCase: AppDependencies.signUpUseCase,
+              reloadCurrentUserUseCase:
+                  AppDependencies.reloadCurrentUserUseCase,
+              sendEmailVerificationUseCase:
+                  AppDependencies.sendEmailVerificationUseCase,
+              authCubit: AppDependencies.authCubit,
+              initialTabIndex: initialIndex,
+            );
+          },
+        );
       case AppRoutes.home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case AppRoutes.verifyEmail:
+        return MaterialPageRoute(
+          builder: (_) => VerifyEmailScreen(
+            getCurrentUserUseCase: AppDependencies.getCurrentUserUseCase,
+            reloadCurrentUserUseCase:
+                AppDependencies.reloadCurrentUserUseCase,
+            sendEmailVerificationUseCase:
+                AppDependencies.sendEmailVerificationUseCase,
+          ),
+        );
       
       default:
         return MaterialPageRoute(

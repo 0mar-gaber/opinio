@@ -1,5 +1,15 @@
-// Base entity class for all domain entities
+abstract class BaseEntity {}
 
-abstract class BaseEntity {
-  // Add common entity methods here
+class AuthUser extends BaseEntity {
+  final String id;
+  final String? email;
+  final bool emailVerified;
+  final String? displayName;
+
+  AuthUser({
+    required this.id,
+    required this.email,
+    required this.emailVerified,
+    required this.displayName,
+  });
 }

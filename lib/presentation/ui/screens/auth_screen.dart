@@ -1,14 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../domain/usecases/base_usecase.dart';
 import '../../../routes/app_routes.dart';
+import '../../state/cubit/auth_cubit.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/social_button.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  final SignInWithEmailAndPasswordUseCase signInUseCase;
+  final SignUpWithEmailAndPasswordUseCase signUpUseCase;
+  final ReloadCurrentUserUseCase reloadCurrentUserUseCase;
+  final SendEmailVerificationUseCase sendEmailVerificationUseCase;
+  final AuthCubit authCubit;
+  final int initialTabIndex;
+
+  const AuthScreen({
+    super.key,
+    required this.signInUseCase,
+    required this.signUpUseCase,
+    required this.reloadCurrentUserUseCase,
+    required this.sendEmailVerificationUseCase,
+    required this.authCubit,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -17,6 +35,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late final AuthCubit _authCubit;
 
   // Sign In Controllers
   final _signInEmailController = TextEditingController();
@@ -38,7 +57,12 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+    _authCubit = widget.authCubit;
   }
 
   @override
@@ -53,21 +77,27 @@ class _AuthScreenState extends State<AuthScreen>
     super.dispose();
   }
 
-  void _handleSignIn() {
-    if (_signInFormKey.currentState!.validate()) {
-      // Navigate to home on successful sign in
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+  Future<void> _handleSignIn() async {
+    if (!_signInFormKey.currentState!.validate()) {
+      return;
     }
+
+    await _authCubit.signIn(
+      _signInEmailController.text,
+      _signInPasswordController.text,
+    );
   }
 
-  void _handleSignUp() {
-    if (_signUpFormKey.currentState!.validate()) {
-      Navigator.pushNamed(
-        context,
-        AppRoutes.verifyEmail,
-        arguments: _signUpEmailController.text,
-      );
+  Future<void> _handleSignUp() async {
+    if (!_signUpFormKey.currentState!.validate()) {
+      return;
     }
+
+    await _authCubit.signUp(
+      name: _signUpNameController.text,
+      email: _signUpEmailController.text,
+      password: _signUpPasswordController.text,
+    );
   }
 
   @override
@@ -75,31 +105,49 @@ class _AuthScreenState extends State<AuthScreen>
     return Scaffold(
       backgroundColor: AppColors.cloud,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Logo at top
-            Padding(
-              padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
-              child: AppAssets.logoBlueWidget(
-                width: 84.w,
-                height: 40.w,
+        child: BlocListener<AuthCubit, AuthState>(
+          bloc: _authCubit,
+          listener: (context, state) {
+            if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            } else if (state is AuthEmailNotVerified) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.verifyEmail,
+              );
+            } else if (state is AuthAuthenticated) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.home,
+              );
+            }
+          },
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 12.h, bottom: 24.h),
+                child: AppAssets.logoBlueWidget(
+                  width: 84.w,
+                  height: 40.w,
+                ),
               ),
-            ),
-            
-            // Custom Tab Bar with underline design
-            _buildCustomTabBar(),
-            
-            // Tab View
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildSignInTab(),
-                  _buildSignUpTab(),
-                ],
+              _buildCustomTabBar(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildSignInTab(),
+                    _buildSignUpTab(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -138,11 +186,16 @@ class _AuthScreenState extends State<AuthScreen>
   Widget _buildSignInTab() {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Form(
-        key: _signInFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: BlocBuilder<AuthCubit, AuthState>(
+        bloc: _authCubit,
+        builder: (context, state) {
+          final isLoading = state is AuthLoading;
+
+          return Form(
+            key: _signInFormKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
             // Welcome Back Header
             Text(
@@ -221,11 +274,10 @@ class _AuthScreenState extends State<AuthScreen>
 
             SizedBox(height: 32.h),
 
-            // Sign In Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _handleSignIn,
+                onPressed: isLoading ? null : _handleSignIn,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.iris,
                   foregroundColor: AppColors.cloud,
@@ -235,10 +287,21 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   elevation: 0,
                 ),
-                child: Text(
-                  'Sign In',
-                  style: AppTextStyles.buttonText(fontSize: 16.sp),
-                ),
+                child: isLoading
+                    ? SizedBox(
+                        height: 20.h,
+                        width: 20.h,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.cloud,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        'Sign In',
+                        style: AppTextStyles.buttonText(fontSize: 16.sp),
+                      ),
               ),
             ),
             
@@ -297,8 +360,10 @@ class _AuthScreenState extends State<AuthScreen>
             ),
             
             SizedBox(height: 40.h),
-          ],
-        ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -306,12 +371,18 @@ class _AuthScreenState extends State<AuthScreen>
   Widget _buildSignUpTab() {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Form(
-        key: _signUpFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: BlocBuilder<AuthCubit, AuthState>(
+        bloc: _authCubit,
+        builder: (context, state) {
+          final isLoading = state is AuthLoading;
 
+          return Form(
+            key: _signUpFormKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            SizedBox(height: 40.h),
+            
             // Create Account Header
             Text(
               'Create an account',
@@ -422,11 +493,10 @@ class _AuthScreenState extends State<AuthScreen>
             
             SizedBox(height: 32.h),
             
-            // Sign Up Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _handleSignUp,
+                onPressed: isLoading ? null : _handleSignUp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.iris,
                   foregroundColor: AppColors.cloud,
@@ -436,10 +506,21 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   elevation: 0,
                 ),
-                child: Text(
-                  'Sign Up',
-                  style: AppTextStyles.buttonText(fontSize: 16.sp),
-                ),
+                child: isLoading
+                    ? SizedBox(
+                        height: 20.h,
+                        width: 20.h,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.cloud,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        'Sign Up',
+                        style: AppTextStyles.buttonText(fontSize: 16.sp),
+                      ),
               ),
             ),
             
@@ -482,8 +563,10 @@ class _AuthScreenState extends State<AuthScreen>
             ),
             
             SizedBox(height: 40.h),
-          ],
-        ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
