@@ -34,8 +34,11 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigate to auth screen (Sign Up tab)
-                    Navigator.pushNamed(context, AppRoutes.auth);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.auth,
+                      arguments: 1,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.iris,
@@ -65,8 +68,11 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () {
-                    // Navigate to auth screen (Sign In tab)
-                    Navigator.pushNamed(context, AppRoutes.auth);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.auth,
+                      arguments: 0,
+                    );
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.iris,
