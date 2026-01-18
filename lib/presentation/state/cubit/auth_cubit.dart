@@ -69,7 +69,7 @@ class AuthCubit extends BaseCubit<AuthState> {
     if (text.contains('wrong-password')) {
       return 'Incorrect password';
     }
-    if (text.contains('user-not-found')) {
+    if (text.contains('user-not-found')||text.contains('invalid-credential')) {
       return 'No user found for that email';
     }
     if (text.contains('email-already-in-use')) {

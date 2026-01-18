@@ -10,6 +10,8 @@ import '../../../core/utils/helpers.dart';
 import '../../state/cubit/auth_cubit.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/social_button.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../domain/entities/base_entity.dart';
 
 class AuthScreen extends StatefulWidget {
   final SignInWithEmailAndPasswordUseCase signInUseCase;
@@ -101,6 +103,29 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
+  Future<bool> _isProfileCompleted(String uid) async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final data = doc.data() ?? {};
+    final completed = (data['profileCompleted'] as bool?) ?? false;
+    final firstName = (data['firstName'] as String?) ?? '';
+    final lastName = (data['lastName'] as String?) ?? '';
+    final age = (data['age'] as int?) ?? 0;
+    final gender = (data['gender'] as String?) ?? '';
+    if (completed) return true;
+    if (firstName.isNotEmpty && lastName.isNotEmpty && age > 0 && gender.isNotEmpty) return true;
+    return false;
+  }
+
+  Future<void> _navigatePostAuth(AuthUser user) async {
+    final completed = await _isProfileCompleted(user.id);
+    if (!mounted) return;
+    if (completed) {
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    } else {
+      Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,22 +135,35 @@ class _AuthScreenState extends State<AuthScreen>
           bloc: _authCubit,
           listener: (context, state) {
             if (state is AuthError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: AppColors.error,
-                ),
-              );
+              final msg = state.message;
+              if (msg.toLowerCase().contains('no user found')) {
+                _tabController.animateTo(1);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('No email registered. Try to sign up'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              } else if (msg.toLowerCase().contains('email is already in use')) {
+                _tabController.animateTo(0);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Email already registered. Sign in instead'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
             } else if (state is AuthEmailNotVerified) {
-              Navigator.pushReplacementNamed(
-                context,
-                AppRoutes.stepRegistration,
-              );
+              Navigator.pushReplacementNamed(context, AppRoutes.verifyEmail);
             } else if (state is AuthAuthenticated) {
-              Navigator.pushReplacementNamed(
-                context,
-                AppRoutes.home,
-              );
+              _navigatePostAuth(state.user);
             }
           },
           child: Column(
@@ -304,6 +342,7 @@ class _AuthScreenState extends State<AuthScreen>
                         style: AppTextStyles.buttonText(fontSize: 16.sp),
                       ),
               ),
+
             ),
             
             SizedBox(height: 16.h),
@@ -363,7 +402,7 @@ class _AuthScreenState extends State<AuthScreen>
                     SnackBar(content: Text(result.errorMessage!)),
                   );
                 } else if (result.user != null) {
-                  Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);
+                  _navigatePostAuth(result.user!);
                 }
               },
             ),
@@ -576,6 +615,11 @@ class _AuthScreenState extends State<AuthScreen>
                 } else if (result.errorMessage != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(result.errorMessage!)),
+                  );
+                } else if (result.redirectToSignIn) {
+                  _tabController.animateTo(0);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Account exists. Please sign in')),
                   );
                 } else if (result.user != null) {
                   Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);

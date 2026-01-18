@@ -8,6 +8,8 @@ import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/auth_header.dart';
 import '../../../routes/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StepRegistrationScreen extends StatefulWidget {
   const StepRegistrationScreen({super.key});
@@ -52,6 +54,22 @@ class _StepRegistrationScreenState extends State<StepRegistrationScreen> {
         return;
       } else {
         _genderError = null;
+      }
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+        final ageValue = int.tryParse(_ageController.text.trim()) ?? 0;
+        docRef.set({
+          'uid': user.uid,
+          'email': user.email ?? '',
+          'displayName': user.displayName ?? '',
+          'firstName': _firstNameController.text.trim(),
+          'lastName': _lastNameController.text.trim(),
+          'age': ageValue,
+          'gender': _selectedGender,
+          'profileCompleted': true,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
       }
       Navigator.pushReplacementNamed(context, AppRoutes.home);
       return;

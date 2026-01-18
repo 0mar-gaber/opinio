@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../datasources/remote_datasource.dart';
 import '../../data/models/base_model.dart';
 import '../../domain/entities/base_entity.dart';
@@ -55,6 +56,20 @@ class AuthRepositoryImpl implements AuthRepository {
       await user.updateDisplayName(name);
       await user.reload();
       final refreshed = FirebaseAuth.instance.currentUser ?? user;
+      try {
+        final firestore = FirebaseFirestore.instance;
+        final docRef = firestore.collection('users').doc(refreshed.uid);
+        final snapshot = await docRef.get();
+        if (!snapshot.exists) {
+          await docRef.set({
+            'uid': refreshed.uid,
+            'email': refreshed.email ?? email,
+            'displayName': refreshed.displayName ?? name,
+            'profileCompleted': false,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (_) {}
       return AuthUserModel.fromFirebaseUser(refreshed).toEntity();
     } catch (_) {
       return AuthUserModel.fromFirebaseUser(user).toEntity();

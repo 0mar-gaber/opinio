@@ -9,12 +9,14 @@ import '../../domain/entities/base_entity.dart';
 class GoogleAuthResult {
   final AuthUser? user;
   final bool redirectToSignUp;
+  final bool redirectToSignIn;
   final bool canceled;
   final String? errorMessage;
 
   GoogleAuthResult({
     this.user,
     this.redirectToSignUp = false,
+    this.redirectToSignIn = false,
     this.canceled = false,
     this.errorMessage,
   });
@@ -23,6 +25,8 @@ class GoogleAuthResult {
       GoogleAuthResult(user: user);
   factory GoogleAuthResult.redirect() =>
       GoogleAuthResult(redirectToSignUp: true);
+  factory GoogleAuthResult.redirectSignIn() =>
+      GoogleAuthResult(redirectToSignIn: true);
   factory GoogleAuthResult.canceled() => GoogleAuthResult(canceled: true);
   factory GoogleAuthResult.error(String message) =>
       GoogleAuthResult(errorMessage: message);
@@ -111,11 +115,17 @@ class GoogleAuthService {
       if (kIsWeb) {
         final provider = GoogleAuthProvider();
         provider.setCustomParameters({'prompt': 'select_account'});
-        final result = await _auth.signInWithPopup(provider);
-        final user = result.user;
+        final userCredential = await _auth.signInWithPopup(provider);
+        final isNew = userCredential.additionalUserInfo?.isNewUser ?? false;
+        final user = userCredential.user;
         if (user == null) return GoogleAuthResult.error('No user returned');
-        await _ensureUserDocument(user);
-        return GoogleAuthResult.success(AuthUserModel.fromFirebaseUser(user).toEntity());
+        if (!isNew) {
+          await _auth.signOut();
+          return GoogleAuthResult.redirectSignIn();
+        } else {
+          await _ensureUserDocument(user);
+          return GoogleAuthResult.success(AuthUserModel.fromFirebaseUser(user).toEntity());
+        }
       } else {
         if (forceAccountSelection) {
           await _googleSignIn.signOut();
@@ -130,12 +140,18 @@ class GoogleAuthService {
           idToken: authTokens.idToken,
         );
         final result = await _auth.signInWithCredential(credential);
+        final isNew = result.additionalUserInfo?.isNewUser ?? false;
         final user = result.user;
         if (user == null) {
           return GoogleAuthResult.error('No user returned');
         }
-        await _ensureUserDocument(user);
-        return GoogleAuthResult.success(AuthUserModel.fromFirebaseUser(user).toEntity());
+        if (!isNew) {
+          await _auth.signOut();
+          return GoogleAuthResult.redirectSignIn();
+        } else {
+          await _ensureUserDocument(user);
+          return GoogleAuthResult.success(AuthUserModel.fromFirebaseUser(user).toEntity());
+        }
       }
     } on FirebaseAuthException catch (e) {
       final mapped = _mapFirebaseError(e);

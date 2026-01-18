@@ -6,6 +6,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../domain/entities/base_entity.dart';
 import '../../../domain/usecases/base_usecase.dart';
 import '../../../routes/app_routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -41,6 +42,19 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     });
   }
 
+  Future<bool> _isProfileCompleted(String uid) async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final data = doc.data() ?? {};
+    final completed = (data['profileCompleted'] as bool?) ?? false;
+    final firstName = (data['firstName'] as String?) ?? '';
+    final lastName = (data['lastName'] as String?) ?? '';
+    final age = (data['age'] as int?) ?? 0;
+    final gender = (data['gender'] as String?) ?? '';
+    if (completed) return true;
+    if (firstName.isNotEmpty && lastName.isNotEmpty && age > 0 && gender.isNotEmpty) return true;
+    return false;
+  }
+
   Future<void> _checkVerification() async {
     final user = await widget.getCurrentUserUseCase(NoParams());
 
@@ -49,7 +63,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         return;
       }
 
-      Navigator.pushReplacementNamed(context, AppRoutes.auth);
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.auth,
+        arguments: 1,
+      );
       return;
     }
 
@@ -66,7 +84,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       }
 
       if (refreshedUser != null && refreshedUser.emailVerified) {
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        final completed = await _isProfileCompleted(refreshedUser.id);
+        if (!mounted) return;
+        if (completed) {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -99,7 +123,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       if (!mounted) {
         return;
       }
-      Navigator.pushReplacementNamed(context, AppRoutes.auth);
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.auth,
+        arguments: 1,
+      );
       return;
     }
     setState(() {
@@ -211,6 +239,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                         ),
                 ),
               ),
+              SizedBox(height: 20.h),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
