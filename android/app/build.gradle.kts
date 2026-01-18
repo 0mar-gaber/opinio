@@ -10,14 +10,14 @@ plugins {
 
 android {
     namespace = "com.example.untitled"
-    compileSdk = 34  // ✅ رفع نسخة Compile SDK لتوافق المكتبات
+    compileSdk = 35
 
     ndkVersion = "27.0.12077973" // لو مش مغيره من قبل
 
     defaultConfig {
         applicationId = "com.example.untitled"
         minSdk = 23          // زي ما رفعناه قبل كده
-        targetSdk = 34       // ✅ رفع نسخة Target SDK
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
     }

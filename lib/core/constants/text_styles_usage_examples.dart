@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'app_text_styles.dart';
-import 'app_colors.dart';
 
 class TextStylesUsageExamples extends StatelessWidget {
   const TextStylesUsageExamples({super.key});

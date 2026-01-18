@@ -6,6 +6,7 @@ import '../presentation/ui/screens/onboarding_screen.dart';
 import '../presentation/ui/screens/welcome_screen.dart';
 import '../presentation/ui/screens/auth_screen.dart';
 import '../presentation/ui/screens/verify_email_screen.dart';
+import '../presentation/ui/screens/step_registration_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -44,6 +45,10 @@ class RouteGenerator {
             sendEmailVerificationUseCase:
                 AppDependencies.sendEmailVerificationUseCase,
           ),
+        );
+      case AppRoutes.stepRegistration:
+        return MaterialPageRoute(
+          builder: (_) => const StepRegistrationScreen(),
         );
       
       default:

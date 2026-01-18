@@ -152,7 +152,7 @@ class ColorUsageExamples extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.evergreen.withOpacity(0.1),
+            color: AppColors.evergreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
@@ -169,7 +169,7 @@ class ColorUsageExamples extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.fuschia.withOpacity(0.1),
+            color: AppColors.fuschia.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(

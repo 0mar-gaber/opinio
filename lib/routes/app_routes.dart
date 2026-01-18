@@ -7,6 +7,7 @@ class AppRoutes {
   static const String welcome = '/welcome';
   static const String auth = '/auth';
   static const String verifyEmail = '/verify-email';
+  static const String stepRegistration = '/step-registration';
   
   // Add more routes here
 }

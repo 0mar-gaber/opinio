@@ -85,39 +85,31 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         ),
       );
     } finally {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        setState(() {
+          _isChecking = false;
+        });
       }
-
-      setState(() {
-        _isChecking = false;
-      });
     }
   }
 
   Future<void> _resendEmail() async {
     final user = await widget.getCurrentUserUseCase(NoParams());
-
     if (user == null) {
       if (!mounted) {
         return;
       }
-
       Navigator.pushReplacementNamed(context, AppRoutes.auth);
       return;
     }
-
     setState(() {
       _isResending = true;
     });
-
     try {
       await widget.sendEmailVerificationUseCase(NoParams());
-
       if (!mounted) {
         return;
       }
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Verification email resent. Please check your inbox.'),
@@ -127,20 +119,17 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       if (!mounted) {
         return;
       }
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Could not resend email. Please try again.'),
         ),
       );
     } finally {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        setState(() {
+          _isResending = false;
+        });
       }
-
-      setState(() {
-        _isResending = false;
-      });
     }
   }
 
@@ -222,7 +211,6 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                         ),
                 ),
               ),
-              SizedBox(height: 16.h),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -244,9 +232,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                           width: 20.h,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.iris,
-                            ),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(AppColors.iris),
                           ),
                         )
                       : Text(

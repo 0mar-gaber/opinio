@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../domain/usecases/base_usecase.dart';
 import '../../../routes/app_routes.dart';
+import '../../../core/utils/helpers.dart';
 import '../../state/cubit/auth_cubit.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/social_button.dart';
@@ -118,7 +119,7 @@ class _AuthScreenState extends State<AuthScreen>
             } else if (state is AuthEmailNotVerified) {
               Navigator.pushReplacementNamed(
                 context,
-                AppRoutes.verifyEmail,
+                AppRoutes.stepRegistration,
               );
             } else if (state is AuthAuthenticated) {
               Navigator.pushReplacementNamed(
@@ -345,8 +346,25 @@ class _AuthScreenState extends State<AuthScreen>
             // Social Buttons
             SocialButton(
               text: 'Continue with Google',
-              onPressed: () {
-                // Handle Google sign in
+              onPressed: () async {
+                final result = await AppDependencies.googleAuthService.signInWithGoogle(forceAccountSelection: true);
+                if (!context.mounted) return;
+                if (result.canceled) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Google sign-in canceled')),
+                  );
+                } else if (result.redirectToSignUp) {
+                  _tabController.animateTo(1);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('No account found. Please sign up')),
+                  );
+                } else if (result.errorMessage != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(result.errorMessage!)),
+                  );
+                } else if (result.user != null) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);
+                }
               },
             ),
             
@@ -548,8 +566,20 @@ class _AuthScreenState extends State<AuthScreen>
             // Social Buttons
             SocialButton(
               text: 'Continue with Google',
-              onPressed: () {
-                // Handle Google sign up
+              onPressed: () async {
+                final result = await AppDependencies.googleAuthService.signUpWithGoogle(forceAccountSelection: true);
+                if (!context.mounted) return;
+                if (result.canceled) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Google sign-up canceled')),
+                  );
+                } else if (result.errorMessage != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(result.errorMessage!)),
+                  );
+                } else if (result.user != null) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);
+                }
               },
             ),
             
