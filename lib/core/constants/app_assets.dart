@@ -35,6 +35,11 @@ class AppAssets {
   static const String onboarding1 = '$_svgPath/onboarding 1.svg';
   static const String onboarding2 = '$_svgPath/onboarding 2.svg';
   static const String onboarding3 = '$_svgPath/onboarding 3.svg';
+  static const String settings = '$_svgPath/settings.svg';
+  static const String notifications = '$_svgPath/notfications.svg';
+  static const String calendar = '$_svgPath/Calendar.svg';
+  static const String home = '$_svgPath/home.svg';
+  static const String message = '$_svgPath/message.svg';
 
   // Helper methods for easy usage
   
@@ -250,6 +255,91 @@ class AppAssets {
       fit: fit ?? BoxFit.contain,
       colorFilter: color != null 
           ? ColorFilter.mode(color, BlendMode.srcIn) 
+          : null,
+    );
+  }
+  
+  static SvgPicture settingsWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      settings,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null 
+          ? ColorFilter.mode(color, BlendMode.srcIn) 
+          : null,
+    );
+  }
+  
+  static SvgPicture notificationsWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      notifications,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null 
+          ? ColorFilter.mode(color, BlendMode.srcIn) 
+          : null,
+    );
+  }
+  
+  static SvgPicture calendarWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      calendar,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null 
+          ? ColorFilter.mode(color, BlendMode.srcIn) 
+          : null,
+    );
+  }
+
+  static SvgPicture homeWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      home,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
+          : null,
+    );
+  }
+
+  static SvgPicture messageWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      message,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
           : null,
     );
   }
