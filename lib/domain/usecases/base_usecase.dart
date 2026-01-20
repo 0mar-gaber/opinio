@@ -60,6 +60,22 @@ class SignUpWithEmailAndPasswordUseCase
   }
 }
 
+class ResetPasswordParams {
+  final String email;
+  ResetPasswordParams({required this.email});
+}
+
+class SendPasswordResetEmailUseCase
+    extends BaseUseCase<void, ResetPasswordParams> {
+  final AuthRepository _repository;
+
+  SendPasswordResetEmailUseCase(this._repository);
+
+  @override
+  Future<void> call(ResetPasswordParams params) {
+    return _repository.sendPasswordResetEmail(params.email);
+  }
+}
 class GetCurrentUserUseCase
     extends BaseUseCase<AuthUser?, NoParams> {
   final AuthRepository _repository;

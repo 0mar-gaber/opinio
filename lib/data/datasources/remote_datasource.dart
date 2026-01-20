@@ -45,4 +45,8 @@ class RemoteDataSource {
     await user.reload();
     return _firebaseAuth.currentUser;
   }
+
+  Future<void> sendPasswordResetEmail({required String email}) {
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
 }

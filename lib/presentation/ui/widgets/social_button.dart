@@ -7,11 +7,13 @@ import '../../../core/constants/app_text_styles.dart';
 class SocialButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final bool isLoading;
 
   const SocialButton({
     super.key,
     required this.text,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   Widget _getIcon() {
@@ -33,7 +35,7 @@ class SocialButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: AppColors.cloud,
           foregroundColor: AppColors.textPrimary,
@@ -46,17 +48,28 @@ class SocialButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.r),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _getIcon(),
-            SizedBox(width: 12.w),
-            Text(
-              text,
-              style: AppTextStyles.bodyMedium(),
-            ),
-          ],
-        ),
+        child: isLoading
+            ? SizedBox(
+                height: 20.h,
+                width: 20.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.textPrimary,
+                  ),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _getIcon(),
+                  SizedBox(width: 12.w),
+                  Text(
+                    text,
+                    style: AppTextStyles.bodyMedium(),
+                  ),
+                ],
+              ),
       ),
     );
   }

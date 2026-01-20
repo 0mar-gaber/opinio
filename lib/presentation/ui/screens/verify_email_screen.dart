@@ -93,8 +93,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Your email is not verified yet.'),
+          SnackBar(
+            content: const Text('Your email is not verified yet.'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -104,8 +105,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not check verification. Please try again.'),
+        SnackBar(
+          content: const Text('Could not check verification. Please try again.'),
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {
@@ -148,8 +150,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not resend email. Please try again.'),
+        SnackBar(
+          content: const Text('Could not resend email. Please try again.'),
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {

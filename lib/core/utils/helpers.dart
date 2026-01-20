@@ -22,6 +22,8 @@ class AppDependencies {
       ReloadCurrentUserUseCase(_authRepository);
   static final SendEmailVerificationUseCase sendEmailVerificationUseCase =
       SendEmailVerificationUseCase(_authRepository);
+  static final SendPasswordResetEmailUseCase sendPasswordResetEmailUseCase =
+      SendPasswordResetEmailUseCase(_authRepository);
 
   static final AuthCubit authCubit = AuthCubit(
     signInUseCase: signInUseCase,

@@ -5,6 +5,7 @@ import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../routes/app_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -67,6 +68,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   void _navigateToHome() {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('onboarding_seen', true);
+    });
     Navigator.pushReplacementNamed(context, AppRoutes.welcome);
   }
 

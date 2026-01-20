@@ -56,6 +56,8 @@ class _AuthScreenState extends State<AuthScreen>
   bool _signInPasswordVisible = false;
   bool _signUpPasswordVisible = false;
   bool _signUpConfirmPasswordVisible = false;
+  bool _isGoogleSignInLoading = false;
+  bool _isGoogleSignUpLoading = false;
 
   @override
   void initState() {
@@ -352,7 +354,7 @@ class _AuthScreenState extends State<AuthScreen>
             Align(
               child: TextButton(
                 onPressed: () {
-                  // Handle forgot password
+                  Navigator.pushNamed(context, AppRoutes.resetPassword);
                 },
                 child: Text(
                   'Forgot Password?',
@@ -385,21 +387,28 @@ class _AuthScreenState extends State<AuthScreen>
             // Social Buttons
             SocialButton(
               text: 'Continue with Google',
+              isLoading: _isGoogleSignInLoading,
               onPressed: () async {
+                setState(() => _isGoogleSignInLoading = true);
                 final result = await AppDependencies.googleAuthService.signInWithGoogle(forceAccountSelection: true);
                 if (!context.mounted) return;
+                setState(() => _isGoogleSignInLoading = false);
                 if (result.canceled) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Google sign-in canceled')),
+                    SnackBar(content: Text('Google sign-in canceled'),backgroundColor: AppColors.error,),
+                  
                   );
                 } else if (result.redirectToSignUp) {
                   _tabController.animateTo(1);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('No account found. Please sign up')),
+                    SnackBar(content: Text('No account found. Please sign up'),backgroundColor: AppColors.error),
                   );
                 } else if (result.errorMessage != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(result.errorMessage!)),
+                    SnackBar(
+                      content: Text(result.errorMessage!),
+                      backgroundColor: AppColors.error,
+                    ),
                   );
                 } else if (result.user != null) {
                   _navigatePostAuth(result.user!);
@@ -605,21 +614,27 @@ class _AuthScreenState extends State<AuthScreen>
             // Social Buttons
             SocialButton(
               text: 'Continue with Google',
+              isLoading: _isGoogleSignUpLoading,
               onPressed: () async {
+                setState(() => _isGoogleSignUpLoading = true);
                 final result = await AppDependencies.googleAuthService.signUpWithGoogle(forceAccountSelection: true);
                 if (!context.mounted) return;
+                setState(() => _isGoogleSignUpLoading = false);
                 if (result.canceled) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Google sign-up canceled')),
+                    SnackBar(content: Text('Google sign-up canceled'),backgroundColor: AppColors.error),
                   );
                 } else if (result.errorMessage != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(result.errorMessage!)),
+                    SnackBar(
+                      content: Text(result.errorMessage!),
+                      backgroundColor: AppColors.error,
+                    ),
                   );
                 } else if (result.redirectToSignIn) {
                   _tabController.animateTo(0);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Account exists. Please sign in')),
+                    SnackBar(content: Text('Account exists. Please sign in'),backgroundColor: AppColors.error),
                   );
                 } else if (result.user != null) {
                   Navigator.pushReplacementNamed(context, AppRoutes.stepRegistration);

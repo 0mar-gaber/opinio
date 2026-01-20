@@ -7,6 +7,7 @@ import '../presentation/ui/screens/welcome_screen.dart';
 import '../presentation/ui/screens/auth_screen.dart';
 import '../presentation/ui/screens/verify_email_screen.dart';
 import '../presentation/ui/screens/step_registration_screen.dart';
+import '../presentation/ui/screens/reset_password_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -49,6 +50,13 @@ class RouteGenerator {
       case AppRoutes.stepRegistration:
         return MaterialPageRoute(
           builder: (_) => const StepRegistrationScreen(),
+        );
+      case AppRoutes.resetPassword:
+        return MaterialPageRoute(
+          builder: (_) => ResetPasswordScreen(
+            sendPasswordResetEmailUseCase:
+                AppDependencies.sendPasswordResetEmailUseCase,
+          ),
         );
       
       default:

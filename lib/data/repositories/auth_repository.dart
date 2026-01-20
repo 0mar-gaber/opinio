@@ -21,6 +21,8 @@ abstract class AuthRepository {
   Future<AuthUser?> reloadCurrentUser();
 
   Future<void> sendEmailVerification();
+
+  Future<void> sendPasswordResetEmail(String email);
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -93,5 +95,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> sendEmailVerification() {
     return _remote.sendEmailVerification();
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) {
+    return _remote.sendPasswordResetEmail(email: email);
   }
 }
