@@ -49,12 +49,23 @@ class _HomeScreenState extends State<HomeScreen>
                   child: _buildMessagesSection(),
                 ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: AppColors.iris,
-        foregroundColor: AppColors.cloud,
-        shape: const CircleBorder(),
-        child: Icon(Icons.add, size: 28.w),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 12.h),
+          FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: AppColors.iris,
+            foregroundColor: AppColors.cloud,
+            shape: const CircleBorder(),
+            child: Icon(Icons.add, size: 28.w),
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            'New Case',
+            style: AppTextStyles.small(),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: _buildBottomAppBar(),
@@ -70,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen>
             color: Colors.black.withOpacity(0.08),
             blurRadius: 16,
             spreadRadius: 0,
-            offset: const Offset(0, -4), // shadow من فوق لتحت
+            offset: const Offset(0, -4),
           ),
         ],
       ),

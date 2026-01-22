@@ -43,7 +43,7 @@ class _StepRegistrationScreenState extends State<StepRegistrationScreen> {
     super.dispose();
   }
 
-  void _next() {
+  void _next() async {
     final form = _formKeys[_currentStep - 1].currentState;
     if (form != null && !form.validate()) return;
 
@@ -55,14 +55,27 @@ class _StepRegistrationScreenState extends State<StepRegistrationScreen> {
       } else {
         _genderError = null;
       }
+
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+        final docRef =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+
         final ageValue = int.tryParse(_ageController.text.trim()) ?? 0;
-        docRef.set({
-          'uid': user.uid,
-          'email': user.email ?? '',
-          'displayName': user.displayName ?? '',
+        final fullName =
+            '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}';
+
+        // تحديث الاسم في FirebaseAuth نفسه
+        await user.updateDisplayName(fullName);
+        await user.reload();
+
+        final updatedUser = FirebaseAuth.instance.currentUser;
+
+        // تخزين البيانات في Firestore
+        await docRef.set({
+          'uid': updatedUser!.uid,
+          'email': updatedUser.email ?? '',
+          'displayName': updatedUser.displayName ?? fullName,
           'firstName': _firstNameController.text.trim(),
           'lastName': _lastNameController.text.trim(),
           'age': ageValue,
@@ -71,6 +84,7 @@ class _StepRegistrationScreenState extends State<StepRegistrationScreen> {
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
       }
+
       Navigator.pushReplacementNamed(context, AppRoutes.home);
       return;
     }
