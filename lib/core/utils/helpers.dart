@@ -3,6 +3,8 @@ import '../../data/repositories/auth_repository.dart';
 import '../../data/services/google_auth_service.dart';
 import '../../domain/usecases/base_usecase.dart';
 import '../../presentation/state/cubit/auth_cubit.dart';
+import 'package:get_it/get_it.dart';
+import '../../presentation/state/cubit/booking_cubit.dart';
 
 class AppDependencies {
   AppDependencies._();
@@ -11,6 +13,7 @@ class AppDependencies {
   static final AuthRepository _authRepository =
       AuthRepositoryImpl(_remoteDataSource);
   static final GoogleAuthService googleAuthService = GoogleAuthService();
+  static final GetIt getIt = GetIt.instance;
 
   static final SignInWithEmailAndPasswordUseCase signInUseCase =
       SignInWithEmailAndPasswordUseCase(_authRepository);
@@ -32,4 +35,10 @@ class AppDependencies {
     reloadCurrentUserUseCase: reloadCurrentUserUseCase,
     sendEmailVerificationUseCase: sendEmailVerificationUseCase,
   );
+
+  static void register() {
+    if (!getIt.isRegistered<BookingCubit>()) {
+      getIt.registerFactory<BookingCubit>(() => BookingCubit());
+    }
+  }
 }

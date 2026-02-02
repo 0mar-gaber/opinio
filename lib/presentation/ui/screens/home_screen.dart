@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../routes/app_routes.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../domain/usecases/base_usecase.dart';
 
@@ -54,7 +55,9 @@ class _HomeScreenState extends State<HomeScreen>
         children: [
           SizedBox(height: 12.h),
           FloatingActionButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.booking);
+            },
             backgroundColor: AppColors.iris,
             foregroundColor: AppColors.cloud,
             shape: const CircleBorder(),
@@ -78,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen>
         color: AppColors.cloud,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             spreadRadius: 0,
             offset: const Offset(0, -4),

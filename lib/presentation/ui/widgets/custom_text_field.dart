@@ -43,23 +43,23 @@ class CustomTextField extends StatelessWidget {
         filled: true,
         fillColor: AppColors.cloud,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(16.r),
           borderSide: BorderSide(color: AppColors.dorian, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(16.r),
           borderSide: BorderSide(color: AppColors.dorian, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(16.r),
           borderSide: BorderSide(color: AppColors.iris, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(16.r),
           borderSide: BorderSide(color: AppColors.fuschia, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(16.r),
           borderSide: BorderSide(color: AppColors.fuschia, width: 2),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),

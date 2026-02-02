@@ -40,6 +40,9 @@ class AppAssets {
   static const String calendar = '$_svgPath/Calendar.svg';
   static const String home = '$_svgPath/home.svg';
   static const String message = '$_svgPath/message.svg';
+  static const String location = '$_svgPath/location.svg';
+  static const String years = '$_svgPath/years.svg';
+  static const String star = '$_svgPath/star.svg';
 
   // Helper methods for easy usage
   
@@ -335,6 +338,57 @@ class AppAssets {
   }) {
     return SvgPicture.asset(
       message,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
+          : null,
+    );
+  }
+
+  static SvgPicture locationWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      location,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
+          : null,
+    );
+  }
+
+  static SvgPicture yearsWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      years,
+      width: width,
+      height: height,
+      fit: fit ?? BoxFit.contain,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
+          : null,
+    );
+  }
+
+  static SvgPicture starWidget({
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return SvgPicture.asset(
+      star,
       width: width,
       height: height,
       fit: fit ?? BoxFit.contain,

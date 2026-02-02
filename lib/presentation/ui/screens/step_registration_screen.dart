@@ -85,6 +85,7 @@ class _StepRegistrationScreenState extends State<StepRegistrationScreen> {
         }, SetOptions(merge: true));
       }
 
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, AppRoutes.home);
       return;
     }
